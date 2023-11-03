@@ -2,23 +2,22 @@ import fastify from 'fastify';
 
 import app from './app';
 import config from './config';
+import { getLoggerConfigurationPerEnv } from './utils/logger';
 
 const server = fastify({
-  logger: {
-    prettyPrint: true
-  }
+  logger: getLoggerConfigurationPerEnv()
 });
-
-server.register(app);
 
 /**
  * Entry point for server.
  */
 async function start() {
-  const { port } = config;
+  const { host, port } = config;
 
   try {
-    server.listen(port);
+    server.register(app);
+
+    await server.listen({ host, port: +port });
   } catch (e) {
     server.log.error(e);
 
